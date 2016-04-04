@@ -1,4 +1,5 @@
 from dockerspawner import SystemUserSpawner
+from tornado.concurrent import Future
 
 class HostNetSpawner(SystemUserSpawner):
 
@@ -14,4 +15,9 @@ class HostNetSpawner(SystemUserSpawner):
         return env
 
     def get_ip_and_port(self):
-        return '127.0.0.1', self.jupyter_port
+        #Some weird stuff to satisfy tornado
+        res = Future()
+        res.set_result(('127.0.0.1', self.jupyter_port))
+        res = yield res
+        return res[0], res[1]
+
